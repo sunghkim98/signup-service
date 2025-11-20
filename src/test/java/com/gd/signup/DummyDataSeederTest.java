@@ -1,25 +1,14 @@
 package com.gd.signup;
 
-import com.gd.signup.event.Enum.ApprovalMode;
-import com.gd.signup.event.Enum.CollectedField;
 import com.gd.signup.event.EventRepository;
-import com.gd.signup.event.entity.Event;
+import com.gd.signup.init.DummyDataInitializer;
 import com.gd.signup.member.MemberRepository;
-import com.gd.signup.member.entity.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,9 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DummyDataSeederTest {
 
-        private static final int MEMBER_COUNT = 5;
-        private static final int EVENTS_PER_MEMBER = 30;
-
         @Autowired
         private MemberRepository memberRepository;
 
@@ -56,51 +42,16 @@ class DummyDataSeederTest {
         private EventRepository eventRepository;
 
         @Test
-        @DisplayName("시작 시 멤버 5명과 각 멤버별 30개의 이벤트를 생성한다")
+        @DisplayName("시작 시 멤버 5명과 각 멤버별 30개의 이벤트가 준비된다")
         void seedMembersAndEvents() {
-                List<Member> members = createMembers();
-                createEventsForMembers(members);
+                assertThat(memberRepository.count())
+                                .as("멤버 수는 최소 %s명 이상", DummyDataInitializer.DUMMY_MEMBER_COUNT)
+                                .isGreaterThanOrEqualTo(DummyDataInitializer.DUMMY_MEMBER_COUNT);
 
-                assertThat(memberRepository.count()).isGreaterThanOrEqualTo(MEMBER_COUNT);
-                assertThat(eventRepository.count()).isGreaterThanOrEqualTo((long) MEMBER_COUNT * EVENTS_PER_MEMBER);
-        }
-
-        private List<Member> createMembers() {
-                List<Member> members = new ArrayList<>();
-                for (int i = 1; i <= MEMBER_COUNT; i++) {
-                        Member member = new Member(
-                                        "dummy_user_" + i,
-                                        "TEST_PROVIDER",
-                                        "provider-user-" + i
-                        );
-                        member.changeName("Dummy User " + i);
-                        member.changeEmail("dummy" + i + "@example.com");
-                        member.changePhone("010-0000-00" + String.format("%02d", i));
-                        member.changeGender(i % 2);
-                        member.changeBirthDate("1990-01-0" + i);
-                        members.add(memberRepository.save(member));
-                }
-                return members;
-        }
-
-        private void createEventsForMembers(List<Member> members) {
-                Set<CollectedField> requiredFields = EnumSet.of(CollectedField.NAME, CollectedField.PHONE);
-                for (Member member : members) {
-                        for (int i = 1; i <= EVENTS_PER_MEMBER; i++) {
-                                Date startTime = Date.from(Instant.now().plus(Duration.ofDays(i)));
-                                Date endTime = Date.from(startTime.toInstant().plus(Duration.ofHours(2)));
-                                Event event = new Event(
-                                                member,
-                                                "Demo Event " + i + " for " + member.getLoginId(),
-                                                "Online",
-                                                100L,
-                                                startTime,
-                                                endTime,
-                                                ApprovalMode.AUTO,
-                                                requiredFields
+                assertThat(eventRepository.count())
+                                .as("이벤트 수는 최소 %s개 이상", (long) DummyDataInitializer.DUMMY_MEMBER_COUNT * DummyDataInitializer.DUMMY_EVENTS_PER_MEMBER)
+                                .isGreaterThanOrEqualTo(
+                                                (long) DummyDataInitializer.DUMMY_MEMBER_COUNT * DummyDataInitializer.DUMMY_EVENTS_PER_MEMBER
                                 );
-                                eventRepository.save(event);
-                        }
-                }
         }
 }
