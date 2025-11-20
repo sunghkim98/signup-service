@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
-	List<Event> findByHostIdAndDeletedFalseOrderByCreateTimeDesc(Long hostId);
-	boolean existsByHost_IdAndId(Long memberId, Long eventId);
-	boolean existsByIdAndDeletedFalse(Long id);
+        List<Event> findByHostIdAndDeletedFalseOrderByCreateTimeDesc(Long hostId);
+        boolean existsByHost_IdAndId(Long memberId, Long eventId);
+        boolean existsByIdAndDeletedFalse(Long id);
+        long countByHost_Id(Long hostId);
 }
