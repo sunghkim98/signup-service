@@ -24,7 +24,25 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@TestPropertySource(properties = {
+                "spring.datasource.url=${TEST_DB_URL}",
+                "spring.datasource.username=${TEST_DB_USERNAME}",
+                "spring.datasource.password=${TEST_DB_PASSWORD}",
+                "spring.test.database.replace=NONE",
+                "spring.jpa.hibernate.ddl-auto=create-drop",
+                "spring.jpa.properties.hibernate.format_sql=false",
+                "spring.jpa.properties.hibernate.show_sql=false",
+                "logging.level.org.hibernate.SQL=debug",
+                "spring.jpa.open-in-view=false",
+                "spring.sql.init.mode=never",
+                "app.jwt.secret=${APP_JWT_SECRET}",
+                "app.jwt.access-exp-seconds=900",
+                "app.jwt.refresh-exp-seconds=1209600",
+                "app.qr.payload-base=http://192.168.35.55:8080",
+                "app.storage.signature-dir=/Users/kimseonghun/signature",
+                "spring.security.filter.dispatch=true",
+                "server.port=8080"
+})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DummyDataSeederTest {
 
