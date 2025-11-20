@@ -41,9 +41,10 @@ public class DummyDataInitializer implements ApplicationRunner {
         private List<Member> prepareMembers() {
                 List<Member> members = new ArrayList<>();
                 for (int i = 1; i <= DUMMY_MEMBER_COUNT; i++) {
-                        String providerUserId = "provider-user-" + i;
+                        final int memberIndex = i;
+                        String providerUserId = "provider-user-" + memberIndex;
                         Member member = memberRepository.findByProviderAndProviderUserId(PROVIDER, providerUserId)
-                                        .orElseGet(() -> memberRepository.save(buildMember(i)));
+                                        .orElseGet(() -> memberRepository.save(buildMember(memberIndex)));
                         members.add(member);
                 }
                 return members;
