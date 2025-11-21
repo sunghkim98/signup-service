@@ -45,12 +45,15 @@ public class Event {
 	@Column(nullable = false, length = 200)
 	private String name;
 
-	@Column(length = 200)
-	private String place;
+        @Column(length = 200)
+        private String place;
 
-	// 수용 인원(의미를 명확히 capacity로)
-	@Column(name = "capacity")
-	private Long capacity;
+        @Column(name = "description", length = 1000)
+        private String description;
+
+        // 수용 인원(의미를 명확히 capacity로)
+        @Column(name = "capacity")
+        private Long capacity;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "start_time", nullable = false)
@@ -93,18 +96,20 @@ public class Event {
 	@Column(name = "collect_field") // ex) "NAME", "PHONE" 등
 	private Set<CollectedField> requiredFields = new HashSet<>();
 
-	@Embedded
-	private QrLinks qrLinks;
+        @Embedded
+        private QrLinks qrLinks;
 
-	public Event(Member host, String name, String place,
-				 Long capacity, Date startTime, Date endTime,
-				 ApprovalMode mode, Set<CollectedField> requiredFields) {
-		this.host = host;
-		this.name = name;
-		this.place = place;
-		this.capacity = capacity;
-		this.startTime = startTime;
-		this.endTime = endTime;
+        public Event(Member host, String name, String place,
+                                 String description,
+                                 Long capacity, Date startTime, Date endTime,
+                                 ApprovalMode mode, Set<CollectedField> requiredFields) {
+                this.host = host;
+                this.name = name;
+                this.place = place;
+                this.description = description;
+                this.capacity = capacity;
+                this.startTime = startTime;
+                this.endTime = endTime;
 		this.status = EventStatus.SCHEDULED;
 		this.deleted = false;
 		this.approvalMode = mode;
@@ -118,12 +123,13 @@ public class Event {
 		this.status = EventStatus.RUNNING;
 	}
 
-	public void edit(EventEditDto e) {
-		this.name = e.getEventName();
-		this.place = e.getPlace();
-		this.capacity = e.getCapacity();
-		this.startTime = e.getStartTime();
-		this.endTime = e.getEndTime();
+        public void edit(EventEditDto e) {
+                this.name = e.getEventName();
+                this.place = e.getPlace();
+                this.description = e.getDescription();
+                this.capacity = e.getCapacity();
+                this.startTime = e.getStartTime();
+                this.endTime = e.getEndTime();
 	}
 
 	public void close() {

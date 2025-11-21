@@ -37,6 +37,7 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
             e.id,
             e.name,
             e.place,
+            e.description,
             e.capacity,
             e.startTime,
             e.endTime,

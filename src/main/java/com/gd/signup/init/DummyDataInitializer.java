@@ -79,6 +79,7 @@ public class DummyDataInitializer implements ApplicationRunner {
                                                 member,
                                                 "Demo Event " + eventIndex + " for " + member.getLoginId(),
                                                 "Online",
+                                                "Demo description for event " + eventIndex,
                                                 100L,
                                                 startTime,
                                                 endTime,

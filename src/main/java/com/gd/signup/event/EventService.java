@@ -42,12 +42,13 @@ public class EventService {
 				.orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
 		Event event = new Event(
-				member,
-				dto.getEventName(),
-				dto.getPlace(),
-				dto.getCapacity(),
-				dto.getStartTime(),
-				dto.getEndTime(),
+                                member,
+                                dto.getEventName(),
+                                dto.getPlace(),
+                                dto.getDescription(),
+                                dto.getCapacity(),
+                                dto.getStartTime(),
+                                dto.getEndTime(),
 				dto.getMode(),
 				dto.getCollectedFields()
 		);
