@@ -16,30 +16,33 @@ import java.util.Date;
 public class RegisteredEventDto {
 
 	private Long eventId;
-	private String eventName;
-	private String place;
-	private Long capacity;
-	private Date startTime;
-	private Date endTime;
+        private String eventName;
+        private String place;
+        private String description;
+        private Long capacity;
+        private Date startTime;
+        private Date endTime;
 	private EventStatus eventStatus;              // Event.status
 	private QrLinks qrLinks;                      // Event.qrLinks
 	private RegistrationStatus registrationStatus; // Registration.status
 
-	public RegisteredEventDto(Long eventId,
-							  String eventName,
-							  String place,
-							  Long capacity,
-							  Date startTime,
-							  Date endTime,
+        public RegisteredEventDto(Long eventId,
+                                                          String eventName,
+                                                          String place,
+                                                          String description,
+                                                          Long capacity,
+                                                          Date startTime,
+                                                          Date endTime,
 							  EventStatus eventStatus,
 							  QrLinks qrLinks,
 							  RegistrationStatus registrationStatus) {
-		this.eventId = eventId;
-		this.eventName = eventName;
-		this.place = place;
-		this.capacity = capacity;
-		this.startTime = startTime;
-		this.endTime = endTime;
+                this.eventId = eventId;
+                this.eventName = eventName;
+                this.place = place;
+                this.description = description;
+                this.capacity = capacity;
+                this.startTime = startTime;
+                this.endTime = endTime;
 		this.eventStatus = eventStatus;
 		this.qrLinks = qrLinks;
 		this.registrationStatus = registrationStatus;

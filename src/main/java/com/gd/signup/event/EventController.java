@@ -41,14 +41,26 @@ public class EventController {
 	/**
 	 * 이벤트 참여
 	 **/
-	@PostMapping("/join/{eventId}")
-	public ResponseEntity eventJoin(@AuthenticationPrincipal(expression = "id") Long memberId,
-									@PathVariable Long eventId) {
-		System.out.println("memberId = " + memberId);
-		eventService.registAtEvent(memberId, eventId);
+        @PostMapping("/join/{eventId}")
+        public ResponseEntity eventJoin(@AuthenticationPrincipal(expression = "id") Long memberId,
+                                                                        @PathVariable Long eventId) {
+                System.out.println("memberId = " + memberId);
+                eventService.registAtEvent(memberId, eventId);
 
-		return new ResponseEntity(Response.res(StatusCode.OK, ResponseMsg.REGIST_EVENT), HttpStatus.OK);
-	}
+                return new ResponseEntity(Response.res(StatusCode.OK, ResponseMsg.REGIST_EVENT), HttpStatus.OK);
+        }
+
+
+        /**
+         * 이벤트 참여 취소
+         **/
+        @PatchMapping("/cancel/{eventId}")
+        public ResponseEntity cancelEvent(@AuthenticationPrincipal(expression = "id") Long memberId,
+                                                                        @PathVariable Long eventId) {
+                eventService.cancelRegistration(memberId, eventId);
+
+                return new ResponseEntity(Response.res(StatusCode.OK, ResponseMsg.CHANGE_EVENT_STATUS), HttpStatus.OK);
+        }
 
 	/**
 	 * 모든 이벤트 기록 호출 (호스트용)
@@ -66,31 +78,31 @@ public class EventController {
 	 * 모든 이벤트 기록 호출 (참가자용)
 	 **/
 	@GetMapping("/register")
-	public ResponseEntity getMyRegisteredEvents(
-			@AuthenticationPrincipal(expression = "id") Long memberId,
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size
-	) {
-		Page<RegisteredEventDto> data = eventService.getRegisteredEvents(memberId, page, size);
+        public ResponseEntity getMyRegisteredEvents(
+                        @AuthenticationPrincipal(expression = "id") Long memberId,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size
+        ) {
+                Page<RegisteredEventDto> data = eventService.getRegisteredEvents(memberId, page, size);
 
-		return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, data), HttpStatus.OK);
-	}
+                return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, data), HttpStatus.OK);
+        }
 
 	/**
 	 * 7일 이내에 시작하는 이벤트 호출 (참가자용)
 	 **/
 	@GetMapping("/register/upcoming")
-	public ResponseEntity getUpcomingEvents(@AuthenticationPrincipal(expression = "id") Long memberId) {
-		List<EventResponseDto> data = eventService.getUpcomingRegisterEventsWithinWeek(memberId);
+        public ResponseEntity getUpcomingEvents(@AuthenticationPrincipal(expression = "id") Long memberId) {
+                List<EventResponseDto> data = eventService.getUpcomingRegisterEventsWithinWeek(memberId);
 
-		return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, data), HttpStatus.OK);
-	}
+                return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, data), HttpStatus.OK);
+        }
 
-	/**
-	 * 이벤트에 참여한 승인 완료한 명단
-	 **/
-	@GetMapping("/approve/{eventId}")
-	public ResponseEntity getAllApproveList(@AuthenticationPrincipal(expression = "id") Long memberId,
+        /**
+         * 이벤트에 참여한 승인 완료한 명단
+         **/
+        @GetMapping("/approve/{eventId}")
+        public ResponseEntity getAllApproveList(@AuthenticationPrincipal(expression = "id") Long memberId,
 											@PathVariable Long eventId) {
 		System.out.println("memberId = " + memberId);
 		List<RegistrationResponseDto> res = eventService.getAllApproveList(memberId, eventId);
@@ -110,35 +122,37 @@ public class EventController {
 		return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, res), HttpStatus.OK);
 	}
 
-	/**
-	 * 이벤트 내용 수정
-	 **/
-	@PatchMapping("/edit/{eventId}")
-	public ResponseEntity eventEdit(@AuthenticationPrincipal(expression = "id") Long memberId,
-									@RequestBody EventEditDto eventEditDto) {
-		eventService.editEvent(memberId, eventEditDto);
+        /**
+         * 이벤트 내용 수정
+         **/
+        @PatchMapping("/edit/{eventId}")
+        public ResponseEntity eventEdit(@AuthenticationPrincipal(expression = "id") Long memberId,
+                                                                        @PathVariable Long eventId,
+                                                                        @RequestBody EventEditDto eventEditDto) {
+                eventEditDto.setEventId(eventId);
+                eventService.editEvent(memberId, eventEditDto);
+
+                return new ResponseEntity(Response.res(StatusCode.OK, ResponseMsg.CHANGE_EVENT_STATUS), HttpStatus.OK);
+        }
+
+        /**
+         * 이벤트 종료
+         **/
+        @PatchMapping("/close/{eventId}")
+        public ResponseEntity eventClose(@AuthenticationPrincipal(expression = "id") Long memberId,
+                                                                        @PathVariable Long eventId) {
+                eventService.closeEvent(memberId, eventId);
 
 		return new ResponseEntity(Response.res(StatusCode.OK, ResponseMsg.CHANGE_EVENT_STATUS), HttpStatus.OK);
 	}
 
-	/**
-	 * 이벤트 종료
-	 **/
-	@PatchMapping("/close")
-	public ResponseEntity eventClose(@AuthenticationPrincipal(expression = "id") Long memberId,
-									@PathVariable Long eventId) {
-		eventService.closeEvent(memberId, eventId);
-
-		return new ResponseEntity(Response.res(StatusCode.OK, ResponseMsg.CHANGE_EVENT_STATUS), HttpStatus.OK);
-	}
-
-	/**
-	 * 이벤트 수동 시작
-	 **/
-	@PatchMapping("/running")
-	public ResponseEntity eventRunning(@AuthenticationPrincipal(expression = "id") Long memberId,
-									@PathVariable Long eventId) {
-		eventService.runningEvent(memberId, eventId);
+        /**
+         * 이벤트 수동 시작
+         **/
+        @PatchMapping("/running/{eventId}")
+        public ResponseEntity eventRunning(@AuthenticationPrincipal(expression = "id") Long memberId,
+                                                                        @PathVariable Long eventId) {
+                eventService.runningEvent(memberId, eventId);
 
 		return new ResponseEntity(Response.res(StatusCode.OK, ResponseMsg.CHANGE_EVENT_STATUS), HttpStatus.OK);
 	}

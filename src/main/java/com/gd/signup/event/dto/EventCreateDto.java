@@ -16,11 +16,12 @@ import java.util.Set;
 @Getter @Setter
 @NoArgsConstructor
 public class EventCreateDto {
-	private String eventName;
-	private String place;
-	private Long capacity;
-	private Date startTime;
-	private Date endTime;
+        private String eventName;
+        private String place;
+        private String description;
+        private Long capacity;
+        private Date startTime;
+        private Date endTime;
 	private ApprovalMode mode;
 	private Set<CollectedField> collectedFields;
 }

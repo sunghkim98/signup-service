@@ -15,12 +15,13 @@ import java.util.Date;
 public class EventResponseDto {
 
 	private Long eventId;          // 이벤트 ID
-	private String hostName;       // 주최자 이름
-	private String eventName;      // 이벤트 이름
-	private String place;          // 장소
-	private Long capacity;         // 최대 인원
-	private Date startTime;        // 시작 시간
-	private Date endTime;          // 종료 시간
+        private String hostName;       // 주최자 이름
+        private String eventName;      // 이벤트 이름
+        private String place;          // 장소
+        private String description;    // 설명
+        private Long capacity;         // 최대 인원
+        private Date startTime;        // 시작 시간
+        private Date endTime;          // 종료 시간
 	private Date createTime;       // 생성 시각
 	private Date updateTime;       // 수정 시각
 
@@ -29,12 +30,13 @@ public class EventResponseDto {
 
 		return EventResponseDto.builder()
 				.eventId(event.getId())
-				.hostName(host != null ? host.getName() : "Unknown") // host null일 경우 대비
-				.eventName(event.getName())
-				.place(event.getPlace())
-				.capacity(event.getCapacity())
-				.startTime(event.getStartTime())
-				.endTime(event.getEndTime())
+                                .hostName(host != null ? host.getName() : "Unknown") // host null일 경우 대비
+                                .eventName(event.getName())
+                                .place(event.getPlace())
+                                .description(event.getDescription())
+                                .capacity(event.getCapacity())
+                                .startTime(event.getStartTime())
+                                .endTime(event.getEndTime())
 				.createTime(event.getCreateTime())
 				.updateTime(event.getUpdateTime())
 				.build();
