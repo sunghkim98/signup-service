@@ -42,12 +42,13 @@ public class EventService {
 				.orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
 
 		Event event = new Event(
-				member,
-				dto.getEventName(),
-				dto.getPlace(),
-				dto.getCapacity(),
-				dto.getStartTime(),
-				dto.getEndTime(),
+                                member,
+                                dto.getEventName(),
+                                dto.getPlace(),
+                                dto.getDescription(),
+                                dto.getCapacity(),
+                                dto.getStartTime(),
+                                dto.getEndTime(),
 				dto.getMode(),
 				dto.getCollectedFields()
 		);
@@ -65,9 +66,9 @@ public class EventService {
 	}
 
 	@Transactional
-	public void registAtEvent(Long memberId, Long eventId) {
-		Event event = eventRepository.findById(eventId)
-				.orElseThrow(() -> new NotFoundException("이벤트가 존재하지 않습니다."));
+        public void registAtEvent(Long memberId, Long eventId) {
+                Event event = eventRepository.findById(eventId)
+                                .orElseThrow(() -> new NotFoundException("이벤트가 존재하지 않습니다."));
 
 		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new NotFoundException("회원이 존재하지 않습니다."));
@@ -84,8 +85,22 @@ public class EventService {
 			registration.updateStatus(RegistrationStatus.APPROVED);
 		}
 
-		registrationRepository.save(registration);
-	}
+                registrationRepository.save(registration);
+        }
+
+        @Transactional
+        public void cancelRegistration(Long memberId, Long eventId) {
+                Registration registration = registrationRepository
+                                .findByMember_IdAndEvent_Id(memberId, eventId)
+                                .orElseThrow(() -> new NotFoundException("등록하신 이벤트 정보가 없습니다."));
+
+                if (registration.getStatus() == RegistrationStatus.CANCELED) {
+                        throw new BadRequestException("이미 취소된 이벤트입니다.");
+                }
+
+                registration.updateStatus(RegistrationStatus.CANCELED);
+                registration.updateTime();
+        }
 
 	@Transactional
 	public void runningEvent(Long memberId, Long eventId) {
