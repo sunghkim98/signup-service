@@ -16,20 +16,22 @@ import java.util.Optional;
 
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
 	boolean existsByMemberIdAndEventId(Long memberId, Long eventId);
-	List<Registration> findByEvent_IdAndStatusOrderByCreateTimeDesc(Long eventId, RegistrationStatus status);
-	Optional<Registration> findByEventId(Long Id);
+        List<Registration> findByEvent_IdAndStatusOrderByCreateTimeDesc(Long eventId, RegistrationStatus status);
+        Optional<Registration> findByEventId(Long Id);
+        Optional<Registration> findByMember_IdAndEvent_Id(Long memberId, Long eventId);
 
 	@Query("SELECT r.event.id FROM Registration r WHERE r.member.id = :memberId")
 	List<Long> findEventIdsByMemberId(@Param("memberId") Long memberId);
 
 	//앞으로 7일 이내에 시작하는 이벤트
-	@Query("""	
+        @Query("""
            select r.event
            from Registration r
            where r.member.id = :memberId
+             and r.status <> 'CANCELED'
              and r.event.startTime between :now and :weekLater
            """)
-	List<Event> findUpcomingEventsWithinWeek(@Param("memberId") Long memberId, @Param("now") Date now, @Param("weekLater") Date weekLater);
+        List<Event> findUpcomingEventsWithinWeek(@Param("memberId") Long memberId, @Param("now") Date now, @Param("weekLater") Date weekLater);
 
 	@Query(
 			value = """
@@ -48,16 +50,18 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
         from Registration r
         join r.event e
         where r.member.id = :memberId
+          and r.status <> 'CANCELED'
         order by e.startTime desc
     """,
-			countQuery = """
+                        countQuery = """
         select count(r)
         from Registration r
         where r.member.id = :memberId
+          and r.status <> 'CANCELED'
     """
-	)
-	Page<RegisteredEventDto> findRegisteredEventsByMemberId(
-			@Param("memberId") Long memberId,
+        )
+        Page<RegisteredEventDto> findRegisteredEventsByMemberId(
+                        @Param("memberId") Long memberId,
 			Pageable pageable
 	);
 
