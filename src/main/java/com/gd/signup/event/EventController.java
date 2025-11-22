@@ -3,6 +3,7 @@ package com.gd.signup.event;
 import com.gd.signup.event.dto.EventCreateDto;
 import com.gd.signup.event.dto.EventEditDto;
 import com.gd.signup.event.dto.EventHostResponseDto;
+import com.gd.signup.event.dto.EventHostDetailResponseDto;
 import com.gd.signup.event.dto.EventResponseDto;
 import com.gd.signup.regist.dto.RegisteredEventDto;
 import com.gd.signup.regist.dto.RegistrationResponseDto;
@@ -72,6 +73,17 @@ public class EventController {
         @GetMapping("/host")
         public ResponseEntity getAllEvents(@AuthenticationPrincipal(expression = "id") Long memberId) {
                 List<EventHostResponseDto> res = eventService.getAllEvents(memberId);
+
+                return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, res), HttpStatus.OK);
+        }
+
+        /**
+         * 호스트 이벤트 상세 조회
+         **/
+        @GetMapping("/host/{eventId}")
+        public ResponseEntity getEventDetail(@AuthenticationPrincipal(expression = "id") Long memberId,
+                                             @PathVariable Long eventId) {
+                EventHostDetailResponseDto res = eventService.getEventDetail(memberId, eventId);
 
                 return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, res), HttpStatus.OK);
         }
