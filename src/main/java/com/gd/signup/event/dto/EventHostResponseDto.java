@@ -1,5 +1,7 @@
 package com.gd.signup.event.dto;
 
+import com.gd.signup.event.Enum.ApprovalMode;
+import com.gd.signup.event.Enum.CollectedField;
 import com.gd.signup.event.entity.Event;
 import com.gd.signup.event.qr.QrLinks;
 import com.gd.signup.member.entity.Member;
@@ -8,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -24,6 +27,8 @@ public class EventHostResponseDto {
         private Date createTime;       // 생성 시각
         private Date updateTime;       // 수정 시각
         private QrLinks qrLinks;
+        private ApprovalMode mode;     // 승인 방식
+        private Set<CollectedField> collectedFields; // 수집 항목
         private String status;         // 이벤트 상태
         private long pendingCount;     // 승인 대기 인원 수
         private long approvedCount;    // 승인 완료 인원 수
@@ -45,6 +50,8 @@ public class EventHostResponseDto {
                                 .createTime(event.getCreateTime())
                                 .updateTime(event.getUpdateTime())
                                 .qrLinks(qr != null ? qr : new QrLinks("", ""))
+                                .mode(event.getApprovalMode())
+                                .collectedFields(event.getRequiredFields())
                                 .status(event.getStatus().name())
                                 .pendingCount(pendingCount)
                                 .approvedCount(approvedCount)

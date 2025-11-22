@@ -5,6 +5,7 @@ import com.gd.signup.event.dto.EventEditDto;
 import com.gd.signup.event.dto.EventHostResponseDto;
 import com.gd.signup.event.dto.EventHostDetailResponseDto;
 import com.gd.signup.event.dto.EventResponseDto;
+import com.gd.signup.event.dto.ParticipantSimpleDto;
 import com.gd.signup.regist.dto.RegisteredEventDto;
 import com.gd.signup.regist.dto.RegistrationResponseDto;
 import com.gd.signup.response.Response;
@@ -130,6 +131,17 @@ public class EventController {
         public ResponseEntity getAllPendingList(@AuthenticationPrincipal(expression = "id") Long memberId,
                                                 @PathVariable Long eventId) {
                 List<RegistrationResponseDto> res = eventService.getAllPendingList(memberId, eventId);
+
+                return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, res), HttpStatus.OK);
+        }
+
+        /**
+         * 이벤트에 참가한 명단 (이름, 전화번호)
+         **/
+        @GetMapping("/host/{eventId}/participants")
+        public ResponseEntity getParticipants(@AuthenticationPrincipal(expression = "id") Long memberId,
+                                              @PathVariable Long eventId) {
+                List<ParticipantSimpleDto> res = eventService.getParticipants(memberId, eventId);
 
                 return new ResponseEntity(ResponseData.res(StatusCode.OK, ResponseMsg.GET_DATA_SUCCESS, res), HttpStatus.OK);
         }

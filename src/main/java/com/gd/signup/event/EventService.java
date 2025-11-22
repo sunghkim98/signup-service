@@ -7,6 +7,7 @@ import com.gd.signup.event.dto.EventHostResponseDto;
 import com.gd.signup.event.dto.EventHostDetailResponseDto;
 import com.gd.signup.event.dto.EventResponseDto;
 import com.gd.signup.event.dto.ParticipantDto;
+import com.gd.signup.event.dto.ParticipantSimpleDto;
 import com.gd.signup.event.entity.Event;
 import com.gd.signup.event.qr.QrLinks;
 import com.gd.signup.event.qr.QrService;
@@ -229,6 +230,19 @@ public class EventService {
 				.findByEvent_IdAndStatusOrderByCreateTimeDesc(eventId, RegistrationStatus.REQUESTED)
 				.stream()
                                 .map(RegistrationResponseDto::from)
+                                .toList();
+        }
+
+        @Transactional(readOnly = true)
+        public List<ParticipantSimpleDto> getParticipants(Long memberId, Long eventId) {
+                if (eventRepository.existsByHost_IdAndId(memberId, eventId) != true) {
+                        throw new BadRequestException("호스트가 아닙니다.");
+                }
+
+                return registrationRepository
+                                .findByEvent_IdAndStatusNotOrderByCreateTimeDesc(eventId, RegistrationStatus.CANCELED)
+                                .stream()
+                                .map(ParticipantSimpleDto::from)
                                 .toList();
         }
 
