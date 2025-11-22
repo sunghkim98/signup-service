@@ -4,7 +4,9 @@ import com.gd.signup.event.Enum.ApprovalMode;
 import com.gd.signup.event.dto.EventCreateDto;
 import com.gd.signup.event.dto.EventEditDto;
 import com.gd.signup.event.dto.EventHostResponseDto;
+import com.gd.signup.event.dto.EventHostDetailResponseDto;
 import com.gd.signup.event.dto.EventResponseDto;
+import com.gd.signup.event.dto.ParticipantDto;
 import com.gd.signup.event.entity.Event;
 import com.gd.signup.event.qr.QrLinks;
 import com.gd.signup.event.qr.QrService;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -154,11 +157,16 @@ public class EventService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<EventHostResponseDto> getAllEvents(Long memberId) {
-		return eventRepository.findByHostIdAndDeletedFalseOrderByCreateTimeDesc(memberId).stream()
-				.map(EventHostResponseDto::from)
-				.toList();
-	}
+        public List<EventHostResponseDto> getAllEvents(Long memberId) {
+                return eventRepository.findByHostIdAndDeletedFalseOrderByCreateTimeDesc(memberId).stream()
+                                .map(event -> EventHostResponseDto.from(
+                                                event,
+                                                registrationRepository.countByEvent_IdAndStatus(event.getId(), RegistrationStatus.REQUESTED),
+                                                registrationRepository.countByEvent_IdAndStatus(event.getId(), RegistrationStatus.APPROVED),
+                                                registrationRepository.countByEvent_IdAndStatusNot(event.getId(), RegistrationStatus.CANCELED)
+                                ))
+                                .toList();
+        }
 
 //	@Transactional(readOnly = true)
 //	public List<EventResponseDto> getAllRegisterEvents(Long memberId) {
@@ -198,9 +206,9 @@ public class EventService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<RegistrationResponseDto> getAllApproveList(Long memberId, Long eventId) {
-		if (eventRepository.existsByIdAndDeletedFalse(eventId) != true)
-			throw new BadRequestException("이미 삭제된 이벤트 입니다.");
+        public List<RegistrationResponseDto> getAllApproveList(Long memberId, Long eventId) {
+                if (eventRepository.existsByIdAndDeletedFalse(eventId) != true)
+                        throw new BadRequestException("이미 삭제된 이벤트 입니다.");
 
 		if (eventRepository.existsByHost_IdAndId(memberId, eventId) != true)
 			throw new BadRequestException("호스트가 아닙니다.");
@@ -212,16 +220,38 @@ public class EventService {
 				.toList();
 	}
 
-	public List<RegistrationResponseDto> getAllPendingList(Long memberId, Long eventId) {
-		if (eventRepository.existsByHost_IdAndId(memberId, eventId) != true) {
-			throw new BadRequestException("호스트가 아닙니다.");
-		}
+        public List<RegistrationResponseDto> getAllPendingList(Long memberId, Long eventId) {
+                if (eventRepository.existsByHost_IdAndId(memberId, eventId) != true) {
+                        throw new BadRequestException("호스트가 아닙니다.");
+                }
 
 		return registrationRepository
 				.findByEvent_IdAndStatusOrderByCreateTimeDesc(eventId, RegistrationStatus.REQUESTED)
 				.stream()
-				.map(RegistrationResponseDto::from)
-				.toList();
-	}
+                                .map(RegistrationResponseDto::from)
+                                .toList();
+        }
+
+        @Transactional(readOnly = true)
+        public EventHostDetailResponseDto getEventDetail(Long memberId, Long eventId) {
+                Event event = eventRepository.findById(eventId)
+                                .orElseThrow(() -> new NotFoundException("이벤트가 존재하지 않습니다."));
+
+                if (eventRepository.existsByHost_IdAndId(memberId, eventId) != true) {
+                        throw new BadRequestException("호스트가 아닙니다.");
+                }
+
+                List<ParticipantDto> participants = registrationRepository
+                                .findByEvent_IdAndStatusNotOrderByCreateTimeDesc(eventId, RegistrationStatus.CANCELED)
+                                .stream()
+                                .map(ParticipantDto::from)
+                                .collect(Collectors.toList());
+
+                long pendingCount = registrationRepository.countByEvent_IdAndStatus(eventId, RegistrationStatus.REQUESTED);
+                long approvedCount = registrationRepository.countByEvent_IdAndStatus(eventId, RegistrationStatus.APPROVED);
+                long totalCount = registrationRepository.countByEvent_IdAndStatusNot(eventId, RegistrationStatus.CANCELED);
+
+                return EventHostDetailResponseDto.from(event, participants, pendingCount, approvedCount, totalCount);
+        }
 
 }
