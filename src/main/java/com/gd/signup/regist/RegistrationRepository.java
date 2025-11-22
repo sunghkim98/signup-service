@@ -17,8 +17,11 @@ import java.util.Optional;
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
 	boolean existsByMemberIdAndEventId(Long memberId, Long eventId);
         List<Registration> findByEvent_IdAndStatusOrderByCreateTimeDesc(Long eventId, RegistrationStatus status);
+        List<Registration> findByEvent_IdAndStatusNotOrderByCreateTimeDesc(Long eventId, RegistrationStatus status);
         Optional<Registration> findByEventId(Long Id);
         Optional<Registration> findByMember_IdAndEvent_Id(Long memberId, Long eventId);
+        long countByEvent_IdAndStatus(Long eventId, RegistrationStatus status);
+        long countByEvent_IdAndStatusNot(Long eventId, RegistrationStatus status);
 
 	@Query("SELECT r.event.id FROM Registration r WHERE r.member.id = :memberId")
 	List<Long> findEventIdsByMemberId(@Param("memberId") Long memberId);
